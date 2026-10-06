@@ -31,6 +31,9 @@ mensagemEdicao = signal('');
 // Remoção de produto
 mensagemRemocao = signal('');
 
+// Feedback das operações
+mensagemFeedback = signal('');
+
   constructor(private produtosService: Produtos) {}
 
   ngOnInit(): void {
@@ -92,7 +95,7 @@ mensagemRemocao = signal('');
       preco: preco
     }).subscribe({
       next: () => {
-        this.mensagemCadastro.set('Produto cadastrado com sucesso.');
+        this.mostrarMensagem('Produto cadastrado com sucesso.');
 
         this.nomeNovoProduto.set('');
         this.precoNovoProduto.set(null);
@@ -125,6 +128,8 @@ salvarEdicao(): void {
   const nome = this.nomeEdicao().trim();
   const preco = this.precoEdicao();
 
+  this.mensagemEdicao.set('');
+
   if (
     id === null ||
     !nome ||
@@ -141,7 +146,7 @@ salvarEdicao(): void {
     preco: preco
   }).subscribe({
     next: () => {
-      this.mensagemEdicao.set('Produto atualizado com sucesso.');
+      this.mostrarMensagem('Produto atualizado com sucesso.');
 
       this.idEdicao.set(null);
       this.nomeEdicao.set('');
@@ -161,7 +166,7 @@ removerProduto(id: number): void {
 
   this.produtosService.remover(id).subscribe({
     next: () => {
-      this.mensagemRemocao.set('Produto removido com sucesso.');
+      this.mostrarMensagem('Produto removido com sucesso.');
       this.carregarProdutos();
     },
     error: (erro) => {
@@ -169,5 +174,13 @@ removerProduto(id: number): void {
       this.mensagemRemocao.set('Erro ao remover produto.');
     }
   });
+}
+
+mostrarMensagem(mensagem: string): void {
+  this.mensagemFeedback.set(mensagem);
+
+  setTimeout(() => {
+    this.mensagemFeedback.set('');
+  }, 3000);
 }
 }

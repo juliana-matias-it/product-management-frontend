@@ -1,131 +1,324 @@
-<h1>Gerenciador de Produtos</h1>
+<div class="page">
 
-<h2>Buscar produto por ID</h2>
+  <header class="hero">
+    <div>
+      <span class="badge">Angular + .NET</span>
 
-<input
-  type="number"
-  placeholder="Digite o ID"
-  #campoId
->
+      <h1>Gerenciador de Produtos</h1>
 
-<button
-  (click)="idBusca.set(campoId.valueAsNumber); buscarProduto()">
-  Buscar
-</button>
+      <p>
+        Consulte, cadastre, edite e remova produtos de forma simples
+        usando uma aplicação Angular integrada a uma API .NET.
+      </p>
+    </div>
+  </header>
 
-@if (produtoEncontrado()) {
-  <p>
-    Produto encontrado:
-    {{ produtoEncontrado()!.nome }}
-    - R$ {{ produtoEncontrado()!.preco }}
+  <main class="content">
+
+    <!-- Busca por ID -->
+    <section class="card">
+
+      <div class="section-header">
+        <div>
+          <span class="section-label">Consulta</span>
+          <h2>Buscar produto</h2>
+        </div>
+      </div>
+
+      <div class="form-row">
+
+        <div class="field">
+          <label for="idBusca">ID do produto</label>
+
+          <input
+            id="idBusca"
+            type="number"
+            placeholder="Ex: 1"
+            #campoId
+          >
+        </div>
+
+        <button
+          class="button button-primary"
+          (click)="
+            idBusca.set(campoId.valueAsNumber);
+            buscarProduto()
+          ">
+          Buscar
+        </button>
+
+      </div>
+
+      @if (produtoEncontrado()) {
+        <div class="result-card">
+
+          <div>
+            <span class="result-label">
+              Produto encontrado
+            </span>
+
+            <strong>
+              {{ produtoEncontrado()!.nome }}
+            </strong>
+          </div>
+
+          <span class="price">
+            R$ {{ produtoEncontrado()!.preco }}
+          </span>
+
+        </div>
+      }
+
+      @if (mensagemBusca()) {
+        <p class="message message-warning">
+          {{ mensagemBusca() }}
+        </p>
+      }
+
+    </section>
+
+
+    <!-- Cadastro -->
+    <section class="card">
+
+      <div class="section-header">
+        <div>
+          <span class="section-label">Cadastro</span>
+          <h2>Adicionar produto</h2>
+        </div>
+      </div>
+
+      <div class="form-grid">
+
+        <div class="field">
+
+          <label for="nomeProduto">
+            Nome
+          </label>
+
+          <input
+            id="nomeProduto"
+            type="text"
+            placeholder="Nome do produto"
+            #campoNome
+          >
+
+        </div>
+
+
+        <div class="field">
+
+          <label for="precoProduto">
+            Preço
+          </label>
+
+          <input
+            id="precoProduto"
+            type="number"
+            placeholder="0,00"
+            #campoPreco
+          >
+
+        </div>
+
+
+        <button
+          class="button button-primary button-add"
+          (click)="
+            nomeNovoProduto.set(campoNome.value);
+            precoNovoProduto.set(campoPreco.valueAsNumber);
+            adicionarProduto();
+            campoNome.value = '';
+            campoPreco.value = ''
+          ">
+          Adicionar
+        </button>
+
+      </div>
+
+      @if (mensagemCadastro()) {
+  <p class="message message-warning">
+    {{ mensagemCadastro() }}
   </p>
 }
 
-@if (mensagemBusca()) {
-  <p>{{ mensagemBusca() }}</p>
-}
+    </section>
 
-<h2>Adicionar produto</h2>
 
-<input
-  type="text"
-  placeholder="Nome do produto"
-  #campoNome
->
+    <!-- Listagem de produtos -->
+    <section class="card card-table">
 
-<input
-  type="number"
-  placeholder="Preço"
-  #campoPreco
->
+      <div class="section-header">
 
-<button
-  (click)="
-    nomeNovoProduto.set(campoNome.value);
-    precoNovoProduto.set(campoPreco.valueAsNumber);
-    adicionarProduto();
-    campoNome.value = '';
-    campoPreco.value = ''
-  ">
-  Adicionar
-</button>
+        <div>
+          <span class="section-label">Produtos</span>
+          <h2>Produtos cadastrados</h2>
+        </div>
 
-@if (mensagemCadastro()) {
-  <p>{{ mensagemCadastro() }}</p>
-}
+        <span class="product-count">
+          {{ produtos().length }}
 
-<h2>Produtos cadastrados</h2>
+          {{
+            produtos().length === 1
+              ? 'produto'
+              : 'produtos'
+          }}
+        </span>
 
-<table>
-  <thead>
-    <tr>
-      <th>ID</th>
-      <th>Nome</th>
-      <th>Preço</th>
-      <th>Ações</th>
-    </tr>
-  </thead>
+      </div>
 
-  <tbody>
-    @for (produto of produtos(); track produto.id) {
-      <tr>
-        <td>{{ produto.id }}</td>
 
-        @if (idEdicao() === produto.id) {
-          <td>
-            <input
-              type="text"
-              [value]="nomeEdicao()"
-              #campoNomeEdicao
-            >
-          </td>
+      <div class="table-wrapper">
 
-          <td>
-            <input
-              type="number"
-              [value]="precoEdicao()"
-              #campoPrecoEdicao
-            >
-          </td>
+        <table>
 
-          <td>
-            <button
-              (click)="
-                nomeEdicao.set(campoNomeEdicao.value);
-                precoEdicao.set(campoPrecoEdicao.valueAsNumber);
-                salvarEdicao()
-              ">
-              Salvar
-            </button>
+          <thead>
+            <tr>
+              <th>ID</th>
+              <th>Produto</th>
+              <th>Preço</th>
+              <th>Ações</th>
+            </tr>
+          </thead>
 
-            <button (click)="cancelarEdicao()">
-              Cancelar
-            </button>
-          </td>
 
-        } @else {
-          <td>{{ produto.nome }}</td>
-          <td>R$ {{ produto.preco }}</td>
+          <tbody>
 
-          <td>
-  <button (click)="iniciarEdicao(produto)">
-    Editar
-  </button>
+            @for (produto of produtos(); track produto.id) {
 
-  <button (click)="removerProduto(produto.id)">
-    Remover
-  </button>
-</td>
-        }
-      </tr>
-    }
-  </tbody>
-</table>
+              <tr>
 
-@if (mensagemEdicao()) {
-  <p>{{ mensagemEdicao() }}</p>
+                <td>
+                  <span class="product-id">
+                    #{{ produto.id }}
+                  </span>
+                </td>
+
+
+                @if (idEdicao() === produto.id) {
+
+                  <td>
+
+                    <input
+                      class="table-input"
+                      type="text"
+                      [value]="nomeEdicao()"
+                      #campoNomeEdicao
+                    >
+
+                  </td>
+
+
+                  <td>
+
+                    <input
+                      class="table-input price-input"
+                      type="number"
+                      [value]="precoEdicao()"
+                      #campoPrecoEdicao
+                    >
+
+                  </td>
+
+
+                  <td>
+
+                    <div class="actions">
+
+                      <button
+                        class="button button-save"
+                        (click)="
+                          nomeEdicao.set(campoNomeEdicao.value);
+                          precoEdicao.set(campoPrecoEdicao.valueAsNumber);
+                          salvarEdicao()
+                        ">
+                        Salvar
+                      </button>
+
+
+                      <button
+                        class="button button-secondary"
+                        (click)="cancelarEdicao()">
+                        Cancelar
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                } @else {
+
+                  <td class="product-name">
+                    {{ produto.nome }}
+                  </td>
+
+
+                  <td class="product-price">
+                    R$ {{ produto.preco }}
+                  </td>
+
+
+                  <td>
+
+                    <div class="actions">
+
+                      <button
+                        class="button button-edit"
+                        (click)="iniciarEdicao(produto)">
+                        Editar
+                      </button>
+
+
+                      <button
+                        class="button button-delete"
+                        (click)="removerProduto(produto.id)">
+                        Remover
+                      </button>
+
+                    </div>
+
+                  </td>
+
+                }
+
+              </tr>
+
+            }
+
+          </tbody>
+
+        </table>
+
+      </div>
+
+
+     @if (mensagemEdicao()) {
+  <p class="message message-warning">
+    {{ mensagemEdicao() }}
+  </p>
 }
 
 @if (mensagemRemocao()) {
-  <p>{{ mensagemRemocao() }}</p>
+  <p class="message message-warning">
+    {{ mensagemRemocao() }}
+  </p>
 }
+
+
+
+    </section>
+
+  </main>
+
+
+  <footer>
+    Gerenciador de Produtos • Angular + ASP.NET Core
+  </footer>
+
+  @if (mensagemFeedback()) {
+  <p class="message message-success">
+    {{ mensagemFeedback() }}
+  </p>
+}
+
+</div>
